@@ -30,16 +30,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\ManyToMany(targetEntity: CourierIncoming::class, mappedBy: 'destinataires')]
-    private Collection $courierIncomings;
-
-    #[ORM\OneToMany(mappedBy: 'expediteur', targetEntity: CourierOutcoming::class)]
-    private Collection $courierOutcomings;
+    #[ORM\ManyToMany(targetEntity: Courier::class, mappedBy: 'owners')]
+    private Collection $couriers;
 
     public function __construct()
     {
-        $this->courierIncomings = new ArrayCollection();
-        $this->courierOutcomings = new ArrayCollection();
+        $this->couriers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,57 +109,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, CourierIncoming>
+     * @return Collection<int, Courier>
      */
-    public function getCourierIncomings(): Collection
+    public function getCouriers(): Collection
     {
-        return $this->courierIncomings;
+        return $this->couriers;
     }
 
-    public function addCourierIncoming(CourierIncoming $courierIncoming): self
+    public function addCourier(Courier $courier): self
     {
-        if (!$this->courierIncomings->contains($courierIncoming)) {
-            $this->courierIncomings->add($courierIncoming);
-            $courierIncoming->addDestinataire($this);
+        if (!$this->couriers->contains($courier)) {
+            $this->couriers->add($courier);
+            $courier->addOwner($this);
         }
 
         return $this;
     }
 
-    public function removeCourierIncoming(CourierIncoming $courierIncoming): self
+    public function removeCourier(Courier $courier): self
     {
-        if ($this->courierIncomings->removeElement($courierIncoming)) {
-            $courierIncoming->removeDestinataire($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, CourierOutcoming>
-     */
-    public function getCourierOutcomings(): Collection
-    {
-        return $this->courierOutcomings;
-    }
-
-    public function addCourierOutcoming(CourierOutcoming $courierOutcoming): self
-    {
-        if (!$this->courierOutcomings->contains($courierOutcoming)) {
-            $this->courierOutcomings->add($courierOutcoming);
-            $courierOutcoming->setExpediteur($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCourierOutcoming(CourierOutcoming $courierOutcoming): self
-    {
-        if ($this->courierOutcomings->removeElement($courierOutcoming)) {
-            // set the owning side to null (unless already changed)
-            if ($courierOutcoming->getExpediteur() === $this) {
-                $courierOutcoming->setExpediteur(null);
-            }
+        if ($this->couriers->removeElement($courier)) {
+            $courier->removeOwner($this);
         }
 
         return $this;
