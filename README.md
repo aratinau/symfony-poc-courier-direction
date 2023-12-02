@@ -1,4 +1,15 @@
-# Symfony Courier Direction
+# Symfony POC Courier Direction
+
+## Start project
+
+`dockerup "docker-compose up -d"`
+
+`symfony server:start`
+
+## Stop project
+
+`dockerdown "docker-compose down"`
+
 
 POST /courier_incomings
 
